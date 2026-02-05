@@ -1,0 +1,42 @@
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+FROM node:20-alpine AS builder
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_BASE_URL
+ARG NEXT_PUBLIC_ADSENSE_CLIENT_ID
+ARG NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP
+ARG NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID
+ARG NEXT_PUBLIC_ADSENSE_SLOT_TOOLS_LIST
+ARG NEXT_PUBLIC_ADSENSE_SLOT_TOOL_DETAIL
+ARG NEXT_PUBLIC_ADSENSE_SLOT_TOOL_PAGE
+ENV NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+ENV NEXT_PUBLIC_ADSENSE_CLIENT_ID=${NEXT_PUBLIC_ADSENSE_CLIENT_ID}
+ENV NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP=${NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP}
+ENV NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID=${NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID}
+ENV NEXT_PUBLIC_ADSENSE_SLOT_TOOLS_LIST=${NEXT_PUBLIC_ADSENSE_SLOT_TOOLS_LIST}
+ENV NEXT_PUBLIC_ADSENSE_SLOT_TOOL_DETAIL=${NEXT_PUBLIC_ADSENSE_SLOT_TOOL_DETAIL}
+ENV NEXT_PUBLIC_ADSENSE_SLOT_TOOL_PAGE=${NEXT_PUBLIC_ADSENSE_SLOT_TOOL_PAGE}
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build && npm prune --omit=dev
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+COPY --from=builder --chown=node:node /app/package*.json ./
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder --chown=node:node /app/.next ./.next
+COPY --from=builder --chown=node:node /app/public ./public
+COPY --from=builder --chown=node:node /app/next.config.mjs ./next.config.mjs
+RUN mkdir -p /app/data /app/uploads /app/.next/cache \
+  && chown -R node:node /app
+USER node
+EXPOSE 3000
+CMD ["npm","run","start"]

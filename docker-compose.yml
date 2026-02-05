@@ -1,0 +1,164 @@
+services:
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    depends_on:
+      - web
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      CADDY_EMAIL: ${CADDY_EMAIL:?err}
+      WEB_DOMAIN: ${WEB_DOMAIN:?err}
+      API_DOMAIN: ${API_DOMAIN:?err}
+    volumes:
+      - ./PDFSwifter/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - public
+      - private
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  web:
+    build:
+      context: ./PDFSwifter
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_BASE_URL: "https://${WEB_DOMAIN:?err}"
+        NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}
+        NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP: ${NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP:-}
+        NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID: ${NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID:-}
+        NEXT_PUBLIC_ADSENSE_SLOT_TOOLS_LIST: ${NEXT_PUBLIC_ADSENSE_SLOT_TOOLS_LIST:-}
+        NEXT_PUBLIC_ADSENSE_SLOT_TOOL_DETAIL: ${NEXT_PUBLIC_ADSENSE_SLOT_TOOL_DETAIL:-}
+        NEXT_PUBLIC_ADSENSE_SLOT_TOOL_PAGE: ${NEXT_PUBLIC_ADSENSE_SLOT_TOOL_PAGE:-}
+    restart: unless-stopped
+    depends_on:
+      - api
+    env_file:
+      - ./PDFSwifter/deploy/web.env
+    environment:
+      NODE_ENV: "production"
+      NEXT_PUBLIC_BASE_URL: "https://${WEB_DOMAIN:?err}"
+      API_BASE_URL: "http://api:8000"
+      YOUTUBE_API_BASE_URL: "http://api:8000"
+      TIKTOK_API_BASE_URL: "http://api:8000"
+      PDF_CONVERTER_API_BASE_URL: "http://api:8000"
+      PDFTOOLS_DATA_DIR: "/app/data"
+    volumes:
+      - web_data:/app/data
+      - web_uploads:/app/uploads
+      - web_next_cache:/app/.next/cache
+    expose:
+      - "3000"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    user: "node"
+    networks:
+      - private
+    init: true
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('http').get('http://localhost:3000/api/health', res => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1));"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./PDFSwifter-api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    env_file:
+      - ./PDFSwifter/deploy/api.env
+    environment:
+      DATA_ROOT: "/data"
+      REDIS_URL: "redis://:${REDIS_PASSWORD:?err}@redis:6379/0"
+      ENVIRONMENT: "production"
+    volumes:
+      - api_data:/data
+    expose:
+      - "8000"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks:
+      - private
+    init: true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://localhost:8000/health').status == 200 else sys.exit(1)"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --protected-mode
+      - "yes"
+      - --requirepass
+      - "${REDIS_PASSWORD:?err}"
+    volumes:
+      - redis_data:/data
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:?err}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks:
+      - private
+
+volumes:
+  caddy_data:
+  caddy_config:
+  redis_data:
+  web_data:
+  web_uploads:
+  web_next_cache:
+  api_data:
+
+networks:
+  public:
+  private:

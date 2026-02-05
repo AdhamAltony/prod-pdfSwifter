@@ -1,0 +1,33 @@
+# Mac
+.DS_Store
+
+# Node / Next
+**/node_modules/
+**/.next/
+**/out/
+
+# Python
+**/__pycache__/
+**/.venv/
+**/venv/
+
+# Env files
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local deploy envs
+PDFSwifter/deploy/*.env
+
+# Runtime data / uploads / outputs
+PDFSwifter/data/
+PDFSwifter/uploads/
+PDFSwifter-api/downloads/
+PDFSwifter-api/excel_outputs/
+PDFSwifter-api/image_outputs/
+PDFSwifter-api/pdf_uploads/
+PDFSwifter-api/word_outputs/
+
+# Misc
+**/*.pem
+PDFSwifter-api/cookies1.txt
