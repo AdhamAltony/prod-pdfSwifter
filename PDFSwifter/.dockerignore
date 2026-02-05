@@ -1,0 +1,29 @@
+# Git
+git
+gitignore
+.git/
+
+# Node / Next
+node_modules/
+.next/
+out/
+
+# Env files
+.env
+.env.*
+
+# Local data
+uploads/
+data/
+
+# Tests / docs
+**/*.test.*
+**/*.spec.*
+tests/
+
+# Misc
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

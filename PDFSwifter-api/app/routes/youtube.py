@@ -1,4 +1,5 @@
 import asyncio
+from urllib.parse import urlparse
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
@@ -29,9 +30,31 @@ async def _release_slot() -> None:
         _inflight = max(_inflight - 1, 0)
 
 
+def _is_allowed_youtube_url(raw_url: str) -> bool:
+    if not raw_url:
+        return False
+    parsed = urlparse(raw_url)
+    if parsed.scheme not in {"http", "https"}:
+        return False
+    host = (parsed.hostname or "").lower()
+    if host in {"youtu.be"}:
+        return True
+    if host.endswith(".youtube.com") or host == "youtube.com":
+        return True
+    if host.endswith(".youtube-nocookie.com") or host == "youtube-nocookie.com":
+        return True
+    return False
+
+
 @router.post("/download")
 async def request_youtube_download(url: str):
     """Kick off a YouTube download and return a process identifier."""
+    if not _is_allowed_youtube_url(url):
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Only public YouTube URLs are allowed."},
+        )
+
     if not await _reserve_slot():
         return JSONResponse(
             status_code=429,

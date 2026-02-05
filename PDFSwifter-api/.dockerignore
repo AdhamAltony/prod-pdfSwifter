@@ -1,0 +1,25 @@
+# Git
+.git/
+
+# Python
+__pycache__/
+.venv/
+venv/
+*.pyc
+*.pyo
+
+# Env files
+.env
+.env.*
+
+# Local data/output
+cookies1.txt
+downloads/
+excel_outputs/
+image_outputs/
+pdf_uploads/
+word_outputs/
+
+# Misc
+.DS_Store
+*.log
