@@ -6,6 +6,8 @@ import UsageLimitModal from "./UsageLimitModal";
 import UsageBanner from "./UsageBanner";
 
 export default function UrlToolRunner({ tool }) {
+	const CLIENT_SIDE_TOOLS = new Set(["youtube-download", "tiktok-download"]);
+	const isClientOnly = CLIENT_SIDE_TOOLS.has(tool);
 	const [url, setUrl] = useState("");
 	const [processing, setProcessing] = useState(false);
 	const [message, setMessage] = useState("");
@@ -102,7 +104,7 @@ export default function UrlToolRunner({ tool }) {
 	const handleManualDownload = async () => {
 		if (!manualDownloadData) return;
 		setDownloadInProgress(true);
-		setMessage("Downloading...");
+		setMessage(isClientOnly ? "Opening..." : "Downloading...");
 		try {
 			if (manualDownloadData.type === "job") {
 				await downloadJobFile(manualDownloadData.job, manualDownloadData.filename);
@@ -113,10 +115,19 @@ export default function UrlToolRunner({ tool }) {
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);
+			} else if (manualDownloadData.type === "external") {
+				const newWindow = window.open(
+					manualDownloadData.url,
+					"_blank",
+					"noopener,noreferrer"
+				);
+				if (!newWindow) {
+					throw new Error("Popup blocked. Please allow popups for this site.");
+				}
 			} else if (manualDownloadData.type === "blob" && manualDownloadData.blob) {
 				triggerBlobDownload(manualDownloadData.blob, manualDownloadData.filename);
 			}
-			setMessage("✓ Download started!");
+			setMessage(isClientOnly ? "✓ Opened in a new tab." : "✓ Download started!");
 		} catch (error) {
 			console.error("Download error:", error);
 			setMessage(`Error: ${error.message}`);
@@ -285,6 +296,23 @@ export default function UrlToolRunner({ tool }) {
 
 		let jobStarted = false;
 
+		if (isClientOnly) {
+			const trimmedUrl = url.trim();
+			const newWindow = window.open(trimmedUrl, "_blank", "noopener,noreferrer");
+			setManualDownloadData({
+				type: "external",
+				url: trimmedUrl,
+			});
+			setDownloadReadyJob(null);
+			setMessage(
+				newWindow
+					? "✓ Opened in a new tab. Downloads happen on your device."
+					: "Popup blocked. Click Open Video to continue."
+			);
+			setProcessing(false);
+			return;
+		}
+
 		try {
 			const response = await fetch(`/api/utilities/${tool}/fileprocess`, {
 				method: "POST",
@@ -406,7 +434,7 @@ export default function UrlToolRunner({ tool }) {
 			<div className="mb-6">
 				<UsageBanner usage={usageStatus} loading={usageLoading} />
 			</div>
-			<form onSubmit={handleSubmit} className="space-y-6">
+		<form onSubmit={handleSubmit} className="space-y-6">
 				<div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-teal-400 transition-colors">
 					<LinkIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
           
@@ -426,17 +454,17 @@ export default function UrlToolRunner({ tool }) {
 					</div>
 				</div>
 
-				<div className="flex gap-4">
-					<button
-						type={manualDownloadData ? "button" : "submit"}
-						onClick={manualDownloadData ? handleManualDownload : undefined}
-						disabled={
-							processing ||
-							downloadInProgress ||
-							(!manualDownloadData && !url.trim())
-						}
-						className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-md hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-					>
+			<div className="flex gap-4">
+				<button
+					type={manualDownloadData ? "button" : "submit"}
+					onClick={manualDownloadData ? handleManualDownload : undefined}
+					disabled={
+						processing ||
+						downloadInProgress ||
+						(!manualDownloadData && !url.trim())
+					}
+					className="flex-1 bg-teal-600 text-white py-3 px-6 rounded-md hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+				>
 						{processing ? (
 							<>
 								<div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -447,18 +475,18 @@ export default function UrlToolRunner({ tool }) {
 								<div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
 								Downloading...
 							</>
-						) : manualDownloadData ? (
-							<>
-								<ArrowDownTrayIcon className="h-5 w-5" />
-								Download Video
-							</>
-						) : (
-							<>
-								<ArrowDownTrayIcon className="h-5 w-5" />
-								Download
-							</>
-						)}
-					</button>
+					) : manualDownloadData ? (
+						<>
+							<ArrowDownTrayIcon className="h-5 w-5" />
+							{isClientOnly ? "Open Video" : "Download Video"}
+						</>
+					) : (
+						<>
+							<ArrowDownTrayIcon className="h-5 w-5" />
+							{isClientOnly ? "Open Video" : "Download"}
+						</>
+					)}
+				</button>
 
 					<button
 						type="button"
@@ -513,10 +541,14 @@ export default function UrlToolRunner({ tool }) {
 				)}
 			</form>
 
-			<div className="mt-8 text-sm text-gray-500 text-center">
-				<p>Supported platforms: TikTok, YouTube</p>
+		<div className="mt-8 text-sm text-gray-500 text-center">
+			<p>Supported platforms: TikTok, YouTube</p>
+			{isClientOnly ? (
+				<p>Client-side mode: we open the video on your device and do not download from our servers.</p>
+			) : (
 				<p>Downloads videos in HD quality when available</p>
-			</div>
+			)}
+		</div>
 
 			<UsageLimitModal
 				open={usageModalOpen}
