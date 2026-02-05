@@ -6,9 +6,6 @@ import UsageLimitModal from "./UsageLimitModal";
 import UsageBanner from "./UsageBanner";
 
 export default function UrlToolRunner({ tool }) {
-	const CLIENT_SIDE_TOOLS = new Set(["youtube-download", "tiktok-download"]);
-	const mode = (process.env.NEXT_PUBLIC_VIDEO_DOWNLOAD_MODE || "server").toLowerCase();
-	const isClientOnly = mode === "client" && CLIENT_SIDE_TOOLS.has(tool);
 	const [url, setUrl] = useState("");
 	const [processing, setProcessing] = useState(false);
 	const [message, setMessage] = useState("");
@@ -105,7 +102,7 @@ export default function UrlToolRunner({ tool }) {
 	const handleManualDownload = async () => {
 		if (!manualDownloadData) return;
 		setDownloadInProgress(true);
-		setMessage(isClientOnly ? "Opening..." : "Downloading...");
+		setMessage("Downloading...");
 		try {
 			if (manualDownloadData.type === "job") {
 				await downloadJobFile(manualDownloadData.job, manualDownloadData.filename);
@@ -116,19 +113,10 @@ export default function UrlToolRunner({ tool }) {
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);
-			} else if (manualDownloadData.type === "external") {
-				const newWindow = window.open(
-					manualDownloadData.url,
-					"_blank",
-					"noopener,noreferrer"
-				);
-				if (!newWindow) {
-					throw new Error("Popup blocked. Please allow popups for this site.");
-				}
 			} else if (manualDownloadData.type === "blob" && manualDownloadData.blob) {
 				triggerBlobDownload(manualDownloadData.blob, manualDownloadData.filename);
 			}
-			setMessage(isClientOnly ? "✓ Opened in a new tab." : "✓ Download started!");
+			setMessage("✓ Download started!");
 		} catch (error) {
 			console.error("Download error:", error);
 			setMessage(`Error: ${error.message}`);
@@ -297,23 +285,6 @@ export default function UrlToolRunner({ tool }) {
 
 		let jobStarted = false;
 
-		if (isClientOnly) {
-			const trimmedUrl = url.trim();
-			const newWindow = window.open(trimmedUrl, "_blank", "noopener,noreferrer");
-			setManualDownloadData({
-				type: "external",
-				url: trimmedUrl,
-			});
-			setDownloadReadyJob(null);
-			setMessage(
-				newWindow
-					? "✓ Opened in a new tab. Downloads happen on your device."
-					: "Popup blocked. Click Open Video to continue."
-			);
-			setProcessing(false);
-			return;
-		}
-
 		try {
 			const response = await fetch(`/api/utilities/${tool}/fileprocess`, {
 				method: "POST",
@@ -479,12 +450,12 @@ export default function UrlToolRunner({ tool }) {
 					) : manualDownloadData ? (
 						<>
 							<ArrowDownTrayIcon className="h-5 w-5" />
-							{isClientOnly ? "Open Video" : "Download Video"}
+							Download Video
 						</>
 					) : (
 						<>
 							<ArrowDownTrayIcon className="h-5 w-5" />
-							{isClientOnly ? "Open Video" : "Download"}
+							Download
 						</>
 					)}
 				</button>
@@ -544,11 +515,7 @@ export default function UrlToolRunner({ tool }) {
 
 		<div className="mt-8 text-sm text-gray-500 text-center">
 			<p>Supported platforms: TikTok, YouTube</p>
-			{isClientOnly ? (
-				<p>Client-side mode: we open the video on your device and do not download from our servers.</p>
-			) : (
-				<p>Downloads videos in HD quality when available</p>
-			)}
+			<p>Downloads videos in HD quality when available</p>
 		</div>
 
 			<UsageLimitModal
