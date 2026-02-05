@@ -21,6 +21,8 @@ PDFSwifter/deploy/*.env
 
 # Runtime data / uploads / outputs
 PDFSwifter/data/
+!PDFSwifter/data/
+!PDFSwifter/data/blogPosts.js
 PDFSwifter/uploads/
 PDFSwifter-api/downloads/
 PDFSwifter-api/excel_outputs/
