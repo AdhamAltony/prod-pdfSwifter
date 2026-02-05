@@ -11,6 +11,7 @@ from app.config import (
     YOUTUBE_MAX_FILESIZE_MB,
     YOUTUBE_MAX_RETRIES,
     YOUTUBE_SOCKET_TIMEOUT_SECONDS,
+    YOUTUBE_SOURCE_ADDRESS,
 )
 
 
@@ -32,6 +33,7 @@ def download_video(
         "fragment_retries": YOUTUBE_FRAGMENT_RETRIES,
         "extractor_retries": YOUTUBE_EXTRACTOR_RETRIES,
         "socket_timeout": YOUTUBE_SOCKET_TIMEOUT_SECONDS,
+        "source_address": YOUTUBE_SOURCE_ADDRESS,
         "concurrent_fragment_downloads": YOUTUBE_CONCURRENT_FRAGMENT_DOWNLOADS,
         "geo_bypass": True,
         "continuedl": True,
