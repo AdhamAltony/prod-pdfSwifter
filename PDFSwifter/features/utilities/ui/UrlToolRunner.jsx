@@ -7,7 +7,8 @@ import UsageBanner from "./UsageBanner";
 
 export default function UrlToolRunner({ tool }) {
 	const CLIENT_SIDE_TOOLS = new Set(["youtube-download", "tiktok-download"]);
-	const isClientOnly = CLIENT_SIDE_TOOLS.has(tool);
+	const mode = (process.env.NEXT_PUBLIC_VIDEO_DOWNLOAD_MODE || "server").toLowerCase();
+	const isClientOnly = mode === "client" && CLIENT_SIDE_TOOLS.has(tool);
 	const [url, setUrl] = useState("");
 	const [processing, setProcessing] = useState(false);
 	const [message, setMessage] = useState("");
