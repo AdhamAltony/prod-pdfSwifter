@@ -17,6 +17,11 @@ from app.config import (
     YOUTUBE_REMOTE_ENDPOINT,
 )
 from app.downloaders.common import download_video
+from app.downloaders.cookie_manager import (
+    can_refresh_cookies,
+    is_cookie_error,
+    refresh_cookies_async,
+)
 from app.services.download_tracker import DOWNLOAD_TRACKER
 from app.utils.file_ops import delete_file_later
 
@@ -217,6 +222,7 @@ class LocalYouTubeDownloader(BaseYouTubeDownloader):
         last_update_time = 0.0
         last_progress_bucket = -1
         last_bytes_reported = 0
+        cookies_refreshed = False
 
         def hook(data):
             nonlocal last_update_time, last_progress_bucket, last_bytes_reported
@@ -266,6 +272,27 @@ class LocalYouTubeDownloader(BaseYouTubeDownloader):
                 )
                 break
             except Exception as exc:
+                # Try refreshing cookies if this looks like a cookie error
+                if not cookies_refreshed and is_cookie_error(exc) and can_refresh_cookies():
+                    DOWNLOAD_TRACKER.update_job(
+                        process_id,
+                        status="refreshing_cookies",
+                        error="Cookies may be stale, attempting refresh...",
+                        progress=0.0,
+                    )
+                    refreshed = await refresh_cookies_async()
+                    cookies_refreshed = True
+                    if refreshed:
+                        # Reload options with fresh cookies
+                        custom_options = build_youtube_download_options()
+                        DOWNLOAD_TRACKER.update_job(
+                            process_id,
+                            status="retrying",
+                            error="Cookies refreshed, retrying download...",
+                            progress=0.0,
+                        )
+                        continue
+
                 mapped_error = map_youtube_download_error(exc)
                 if mapped_error:
                     raise RuntimeError(mapped_error) from exc
