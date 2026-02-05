@@ -11,6 +11,8 @@ import httpx
 from app.config import (
     DOWNLOAD_FOLDER,
     DOWNLOAD_RETENTION_SECONDS,
+    YOUTUBE_MAX_RETRIES,
+    YOUTUBE_RETRY_DELAY_SECONDS,
     YOUTUBE_COOKIES_PATH,
     YOUTUBE_REMOTE_ENDPOINT,
 )
@@ -69,6 +71,43 @@ def map_youtube_download_error(error: Exception) -> Optional[str]:
     return None
 
 
+def is_retryable_error(error: Exception) -> bool:
+    message = str(error).lower()
+    non_retryable = (
+        "video unavailable",
+        "private video",
+        "copyright",
+        "members-only",
+        "join this channel",
+        "sign in to confirm",
+        "not a bot",
+        "this video is not available",
+        "age-restricted",
+        "live stream recording is not available",
+        "unsupported url",
+    )
+    if any(token in message for token in non_retryable):
+        return False
+
+    retryable = (
+        "http error 429",
+        "too many requests",
+        "http error 5",
+        "temporarily unavailable",
+        "timed out",
+        "timeout",
+        "connection reset",
+        "connection aborted",
+        "connection refused",
+        "connection error",
+        "network is unreachable",
+        "tls",
+        "ssl",
+        "remote end closed connection",
+    )
+    return any(token in message for token in retryable)
+
+
 class BaseYouTubeDownloader(ABC):
     """Strategy interface for downloading YouTube videos."""
 
@@ -89,7 +128,9 @@ class RemoteYouTubeDownloader(BaseYouTubeDownloader):
         params = {"url": video_url}
         DOWNLOAD_TRACKER.update_job(process_id, status="running", progress=0.0)
 
-        async with httpx.AsyncClient(timeout=None) as client:
+        timeout = httpx.Timeout(connect=10.0, read=60.0, write=60.0, pool=10.0)
+        limits = httpx.Limits(max_keepalive_connections=10, max_connections=20)
+        async with httpx.AsyncClient(timeout=timeout, limits=limits) as client:
             try:
                 async with client.stream(
                     "GET", self.endpoint, params=params, follow_redirects=True
@@ -213,19 +254,34 @@ class LocalYouTubeDownloader(BaseYouTubeDownloader):
             elif status == "finished":
                 DOWNLOAD_TRACKER.update_job(process_id, progress=100.0)
 
-        try:
-            file_path = await asyncio.to_thread(
-                download_video,
-                video_url,
-                output_template,
-                custom_options,
-                hook,
-            )
-        except Exception as exc:
-            mapped_error = map_youtube_download_error(exc)
-            if mapped_error:
-                raise RuntimeError(mapped_error) from exc
-            raise
+        attempt = 0
+        while True:
+            try:
+                file_path = await asyncio.to_thread(
+                    download_video,
+                    video_url,
+                    output_template,
+                    custom_options,
+                    hook,
+                )
+                break
+            except Exception as exc:
+                mapped_error = map_youtube_download_error(exc)
+                if mapped_error:
+                    raise RuntimeError(mapped_error) from exc
+
+                attempt += 1
+                if attempt > max(YOUTUBE_MAX_RETRIES, 0) or not is_retryable_error(exc):
+                    raise
+
+                delay = YOUTUBE_RETRY_DELAY_SECONDS * attempt
+                DOWNLOAD_TRACKER.update_job(
+                    process_id,
+                    status="retrying",
+                    error=str(exc),
+                    progress=0.0,
+                )
+                await asyncio.sleep(delay)
 
         DOWNLOAD_TRACKER.update_job(
             process_id,

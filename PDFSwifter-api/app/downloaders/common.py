@@ -4,6 +4,15 @@ from typing import Callable, Dict, Optional
 import yt_dlp
 from yt_dlp.utils import DownloadError
 
+from app.config import (
+    YOUTUBE_CONCURRENT_FRAGMENT_DOWNLOADS,
+    YOUTUBE_EXTRACTOR_RETRIES,
+    YOUTUBE_FRAGMENT_RETRIES,
+    YOUTUBE_MAX_FILESIZE_MB,
+    YOUTUBE_MAX_RETRIES,
+    YOUTUBE_SOCKET_TIMEOUT_SECONDS,
+)
+
 
 def download_video(
     url: str,
@@ -19,7 +28,22 @@ def download_video(
         "noplaylist": True,
         "quiet": True,
         "no_warnings": True,
+        "retries": YOUTUBE_MAX_RETRIES,
+        "fragment_retries": YOUTUBE_FRAGMENT_RETRIES,
+        "extractor_retries": YOUTUBE_EXTRACTOR_RETRIES,
+        "socket_timeout": YOUTUBE_SOCKET_TIMEOUT_SECONDS,
+        "concurrent_fragment_downloads": YOUTUBE_CONCURRENT_FRAGMENT_DOWNLOADS,
+        "geo_bypass": True,
+        "continuedl": True,
+        "user_agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/121.0.0.0 Safari/537.36"
+        ),
     }
+
+    if YOUTUBE_MAX_FILESIZE_MB and YOUTUBE_MAX_FILESIZE_MB > 0:
+        ydl_opts["max_filesize"] = int(YOUTUBE_MAX_FILESIZE_MB) * 1024 * 1024
 
     if custom_options:
         ydl_opts.update(custom_options)

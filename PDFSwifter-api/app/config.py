@@ -19,6 +19,16 @@ def _env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "t", "yes", "y", "on"}
 
 
+def _env_float(name: str, default: float) -> float:
+    value = os.environ.get(name)
+    if value is None or value == "":
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -58,6 +68,17 @@ for folder in (
 CHUNK_SIZE = 1024 * 1024  # 1MB
 YOUTUBE_REMOTE_ENDPOINT = os.environ.get("YOUTUBE_REMOTE_ENDPOINT")
 YOUTUBE_COOKIES_PATH = os.environ.get("YOUTUBE_COOKIES_PATH")
+YOUTUBE_CONCURRENCY = _env_int("YOUTUBE_CONCURRENCY", 2)
+YOUTUBE_QUEUE_SIZE = _env_int("YOUTUBE_QUEUE_SIZE", 20)
+YOUTUBE_MAX_RETRIES = _env_int("YOUTUBE_MAX_RETRIES", 3)
+YOUTUBE_RETRY_DELAY_SECONDS = _env_float("YOUTUBE_RETRY_DELAY_SECONDS", 5.0)
+YOUTUBE_SOCKET_TIMEOUT_SECONDS = _env_float("YOUTUBE_SOCKET_TIMEOUT_SECONDS", 30.0)
+YOUTUBE_FRAGMENT_RETRIES = _env_int("YOUTUBE_FRAGMENT_RETRIES", 10)
+YOUTUBE_EXTRACTOR_RETRIES = _env_int("YOUTUBE_EXTRACTOR_RETRIES", 3)
+YOUTUBE_CONCURRENT_FRAGMENT_DOWNLOADS = _env_int(
+    "YOUTUBE_CONCURRENT_FRAGMENT_DOWNLOADS", 4
+)
+YOUTUBE_MAX_FILESIZE_MB = _env_int("YOUTUBE_MAX_FILESIZE_MB", 0)
 
 REDIS_URL = os.environ.get("REDIS_URL")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development").strip().lower()
