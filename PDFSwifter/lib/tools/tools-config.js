@@ -18,7 +18,7 @@ const DEFAULT_CONFIG = {
     "pdf-to-jpg": { enabled: true, tier: "freemium" },
     "tiktok-download": { enabled: true, tier: "freemium" },
     "youtube-download": { enabled: true, tier: "freemium" },
-    "pdf-to-word": { enabled: false, tier: "freemium", hardDisabled: true },
+    "pdf-to-word": { enabled: true, tier: "freemium" },
   },
   overrides: {
     forceEnable: [],
