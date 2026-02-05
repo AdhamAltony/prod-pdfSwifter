@@ -37,6 +37,7 @@ def download_video(
         "concurrent_fragment_downloads": YOUTUBE_CONCURRENT_FRAGMENT_DOWNLOADS,
         "geo_bypass": True,
         "continuedl": True,
+        "js_runtimes": "node",
         "user_agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
