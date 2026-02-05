@@ -1,7 +1,7 @@
 import asyncio
 from urllib.parse import urlparse
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from app.config import YOUTUBE_CONCURRENCY, YOUTUBE_QUEUE_SIZE
@@ -46,9 +46,41 @@ def _is_allowed_youtube_url(raw_url: str) -> bool:
     return False
 
 
+async def _extract_url(request: Request) -> str | None:
+    # Prefer query param.
+    url = request.query_params.get("url")
+    if url:
+        return url
+
+    content_type = (request.headers.get("content-type") or "").lower()
+    if "application/json" in content_type:
+        try:
+            payload = await request.json()
+            if isinstance(payload, dict):
+                return payload.get("url")
+        except Exception:
+            return None
+
+    if "application/x-www-form-urlencoded" in content_type or "multipart/form-data" in content_type:
+        try:
+            form = await request.form()
+            return form.get("url")
+        except Exception:
+            return None
+
+    return None
+
+
 @router.post("/download")
-async def request_youtube_download(url: str):
+async def request_youtube_download(request: Request):
     """Kick off a YouTube download and return a process identifier."""
+    url = await _extract_url(request)
+    if not url:
+        return JSONResponse(
+            status_code=400,
+            content={"detail": "Missing url parameter."},
+        )
+
     if not _is_allowed_youtube_url(url):
         return JSONResponse(
             status_code=400,
