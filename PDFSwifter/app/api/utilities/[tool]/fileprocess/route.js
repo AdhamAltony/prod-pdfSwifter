@@ -5,7 +5,6 @@ import { canUseTool, getUsageStatus, incrementUsage } from "@/lib/usage/usage-db
 import { getClientInfo } from "@/shared/utils/getClientInfo";
 import { getConnection } from "@/lib/db";
 import { getToolPolicy } from "@/lib/utilities/tools-policy";
-import { recordToolRun } from "@/lib/utilities/reliability-gate";
 import sql from "mssql";
 
 export async function POST(request, { params }) {
@@ -84,8 +83,6 @@ export async function POST(request, { params }) {
         }
       }
 
-      await recordToolRun(toolKey, toolSucceeded);
-
       if (result && result.success) {
         try {
           await incrementUsage({ ip, token, userId, toolKey });
@@ -128,7 +125,6 @@ export async function POST(request, { params }) {
 
       return new Response(JSON.stringify({ success: false, message: result?.message || "No processor for this tool; processing not performed", usage: usageBefore }), { status: 202 });
     } catch (err) {
-      await recordToolRun(toolKey, false);
       console.error("Processor error:", err);
       return new Response(JSON.stringify({ success: false, message: "Processor error", error: String(err), usage: usageBefore }), { status: 500 });
     }

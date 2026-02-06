@@ -1,5 +1,4 @@
 import { getToolsConfig } from "./tools-config.js";
-import { getReliabilityStatus } from "./reliability-gate.js";
 
 const normalizeKey = (value) =>
   String(value || "")
@@ -30,15 +29,9 @@ export async function getToolPolicy(toolKey) {
     return { enabled: false, reason: "disabled" };
   }
 
-  const reliability = await getReliabilityStatus(normalized);
-  if (reliability.disabled) {
-    return { enabled: false, reason: "reliability_gate", reliability };
-  }
-
   return {
     enabled: true,
     tier: toolConfig.tier || "freemium",
-    reliability,
   };
 }
 

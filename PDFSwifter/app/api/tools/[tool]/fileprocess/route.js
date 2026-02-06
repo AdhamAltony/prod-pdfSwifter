@@ -5,7 +5,6 @@ import { canUseTool, getUsageStatus, incrementUsage } from "@/lib/usage/usage-db
 import { getClientInfo } from "@/shared/utils/getClientInfo";
 import { getConnection } from "@/lib/db";
 import { getToolPolicy } from "@/lib/utilities/tools-policy";
-import { recordToolRun } from "@/lib/utilities/reliability-gate";
 import sql from "mssql";
 
 export async function POST(request, { params }) {
@@ -59,10 +58,7 @@ export async function POST(request, { params }) {
         JSON.stringify({
           success: false,
           code: "tool_disabled",
-          message:
-            policy.reason === "reliability_gate"
-              ? "This tool is temporarily unavailable due to reliability checks."
-              : "This tool is currently unavailable.",
+          message: "This tool is currently unavailable.",
           reason: policy.reason,
         }),
         { status: 403 }
@@ -121,7 +117,6 @@ export async function POST(request, { params }) {
           console.error("User_Actions insert error:", dbErr);
         }
       }
-      await recordToolRun(toolKey, toolSucceeded);
       // Only proceed if processing succeeded
       if (result && result.success) {
         // Increment usage now that processing succeeded
@@ -204,7 +199,6 @@ export async function POST(request, { params }) {
         { status: 202 }
       );
     } catch (err) {
-      await recordToolRun(toolKey, false);
       console.error("Processor error:", err);
       return new Response(
         JSON.stringify({
