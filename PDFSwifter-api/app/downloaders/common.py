@@ -25,6 +25,7 @@ def download_video(
 
     cmd = [
         "yt-dlp",
+        "--cache-dir", "/data/.yt-dlp-cache",
         "--format", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
         "--output", output_template,
         "--merge-output-format", "mp4",

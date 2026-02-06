@@ -23,8 +23,8 @@ COPY . .
 
 # Create non-root user and writable data root for volumes
 RUN useradd --create-home --shell /usr/sbin/nologin appuser \
-    && mkdir -p /data \
-    && chown -R appuser:appuser /data
+    && mkdir -p /data /home/appuser/.cache/yt-dlp \
+    && chown -R appuser:appuser /data /home/appuser/.cache
 
 USER appuser
 
