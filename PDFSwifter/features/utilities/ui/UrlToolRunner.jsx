@@ -116,7 +116,7 @@ export default function UrlToolRunner({ tool }) {
 			} else if (manualDownloadData.type === "blob" && manualDownloadData.blob) {
 				triggerBlobDownload(manualDownloadData.blob, manualDownloadData.filename);
 			}
-			setMessage("✓ Download started!");
+			setMessage("✓ Download started! You can click Download Video again if needed.");
 		} catch (error) {
 			console.error("Download error:", error);
 			setMessage(`Error: ${error.message}`);
@@ -324,7 +324,7 @@ export default function UrlToolRunner({ tool }) {
 						setUsageStatus(data.usage);
 					}
 					const downloadResult = data.result;
-					if ((tool === "youtube-download" || tool === "tiktok-download" || tool === "instagram-download") && downloadResult?.job) {
+					if ((tool === "tiktok-download" || tool === "instagram-download") && downloadResult?.job) {
 						jobStarted = true;
 						startJobTracking(downloadResult.job, data.message || downloadResult.message);
 						return;
@@ -523,7 +523,7 @@ export default function UrlToolRunner({ tool }) {
 			</form>
 
 		<div className="mt-8 text-sm text-gray-500 text-center">
-			<p>Supported platforms: TikTok, YouTube</p>
+			<p>Supported platforms: TikTok, Instagram</p>
 			<p>Downloads videos in HD quality when available</p>
 		</div>
 

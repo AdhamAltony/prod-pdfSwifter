@@ -76,7 +76,6 @@ const AVAILABLE_TOOL_HREFS = new Set( [
 	'/utilities/pdf-to-excel',
 	'/utilities/pdf-to-jpg',
 	'/utilities/tiktok-download',
-	'/utilities/youtube-download',
 	'/utilities/instagram-download',
 ] );
 
@@ -84,7 +83,6 @@ const PREMIUM_TOOL_HREFS = new Set( [] );
 
 const FEATURED_TOOL_HREFS = new Set( [
 	'/utilities/tiktok-download',
-	'/utilities/youtube-download',
 	'/utilities/instagram-download',
 ] );
 
@@ -220,14 +218,6 @@ const tools = [
 		title: 'Download TikTok Video',
 		description: 'Download TikTok videos without watermark.',
 		href: '/utilities/tiktok-download',
-		color: 'download',
-		inputType: 'url',
-	},
-	{
-		icon: YouTubeIcon,
-		title: 'Download YouTube Video',
-		description: 'Download videos from YouTube in HD quality.',
-		href: '/utilities/youtube-download',
 		color: 'download',
 		inputType: 'url',
 	},

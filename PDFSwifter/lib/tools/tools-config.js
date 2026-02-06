@@ -17,7 +17,7 @@ const DEFAULT_CONFIG = {
     "pdf-to-excel": { enabled: true, tier: "freemium" },
     "pdf-to-jpg": { enabled: true, tier: "freemium" },
     "tiktok-download": { enabled: true, tier: "freemium" },
-    "youtube-download": { enabled: true, tier: "freemium" },
+    "youtube-download": { enabled: false, tier: "freemium" },
     "instagram-download": { enabled: true, tier: "freemium" },
     "pdf-to-word": { enabled: true, tier: "freemium" },
   },
