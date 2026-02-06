@@ -100,11 +100,19 @@ function extractVideoId(url) {
         if (urlObj.hostname.includes('youtube.com')) {
             const videoId = urlObj.searchParams.get('v');
             if (videoId) return videoId;
-            
+
+            // Handle /shorts/ URLs (YouTube Shorts)
+            const shortsMatch = urlObj.pathname.match(/\/shorts\/([^/?]+)/);
+            if (shortsMatch) return shortsMatch[1];
+
+            // Handle /live/ URLs (YouTube Live)
+            const liveMatch = urlObj.pathname.match(/\/live\/([^/?]+)/);
+            if (liveMatch) return liveMatch[1];
+
             // Handle /embed/ URLs
             const embedMatch = urlObj.pathname.match(/\/embed\/([^/?]+)/);
             if (embedMatch) return embedMatch[1];
-            
+
             // Handle /v/ URLs
             const vMatch = urlObj.pathname.match(/\/v\/([^/?]+)/);
             if (vMatch) return vMatch[1];
