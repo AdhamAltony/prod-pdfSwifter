@@ -16,7 +16,7 @@ const MAIN_TOOLS = new Set( [
     "PDF to Excel",
     "PDF to JPG",
     "Download TikTok Video",
-    "Download YouTube Video"
+    "Download Instagram Video"
 ] );
 const SECONDARY_TOOLS = new Set( [
     "Rotate PDF",

@@ -69,10 +69,10 @@ const Hero = ({ query, setQuery }) => {
                   PDF to JPG
                 </Link>
                 <Link
-                  href="/utilities/youtube-download"
-                  className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 hover:border-rose-300 hover:bg-rose-100"
+                  href="/utilities/instagram-download"
+                  className="inline-flex items-center rounded-full border border-pink-200 bg-gradient-to-r from-purple-50 to-pink-50 px-3 py-1 text-xs font-semibold text-pink-700 hover:border-pink-300 hover:from-purple-100 hover:to-pink-100"
                 >
-                  YouTube Download
+                  Instagram Download
                 </Link>
                 <Link
                   href="/utilities/tiktok-download"
@@ -103,7 +103,7 @@ const Hero = ({ query, setQuery }) => {
                 Featured lane
               </p>
               <h3 className="mt-3 text-2xl md:text-3xl font-[var(--font-display)] text-slate-900">
-                YouTube + TikTok downloads
+                Instagram + TikTok downloads
               </h3>
               <p className="mt-2 text-sm text-[color:var(--muted)]">
                 Download in seconds with crisp quality and no watermark fuss.
@@ -111,10 +111,10 @@ const Hero = ({ query, setQuery }) => {
 
               <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Link
-                  href="/utilities/youtube-download"
-                  className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 hover:border-rose-300 hover:bg-rose-100"
+                  href="/utilities/instagram-download"
+                  className="rounded-2xl border border-pink-200 bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-3 text-sm font-semibold text-pink-700 hover:border-pink-300 hover:from-purple-100 hover:to-pink-100"
                 >
-                  YouTube Download
+                  Instagram Download
                 </Link>
                 <Link
                   href="/utilities/tiktok-download"

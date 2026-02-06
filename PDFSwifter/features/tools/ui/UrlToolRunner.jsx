@@ -324,7 +324,7 @@ export default function UrlToolRunner({ tool }) {
             setUsageStatus(data.usage);
           }
           const downloadResult = data.result;
-          if ((tool === "youtube-download" || tool === "tiktok-download") && downloadResult?.job) {
+          if ((tool === "instagram-download" || tool === "tiktok-download") && downloadResult?.job) {
             jobStarted = true;
             startJobTracking(downloadResult.job, data.message || downloadResult.message);
             return;
@@ -428,7 +428,7 @@ export default function UrlToolRunner({ tool }) {
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=... or https://www.tiktok.com/@..."
+              placeholder="https://www.instagram.com/reel/... or https://www.tiktok.com/@..."
               className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               disabled={processing}
             />
@@ -523,7 +523,7 @@ export default function UrlToolRunner({ tool }) {
       </form>
 
       <div className="mt-8 text-sm text-gray-500 text-center">
-        <p>Supported platforms: TikTok, YouTube</p>
+        <p>Supported platforms: TikTok, Instagram</p>
         <p>Downloads videos in HD quality when available</p>
       </div>
 

@@ -17,7 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 
-const YouTubeIcon = ( props ) => (
+const InstagramIcon = ( props ) => (
   <svg
     { ...props }
     xmlns="http://www.w3.org/2000/svg"
@@ -27,8 +27,9 @@ const YouTubeIcon = ( props ) => (
     stroke="currentColor"
     className={ props?.className || "w-6 h-6" }
   >
-    <rect x="2" y="5" width="20" height="14" rx="4" ry="4" stroke="currentColor" strokeWidth={ 2 } fill="currentColor" />
-    <path d="M10 8l6 4-6 4V8z" fill="#111827" />
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="currentColor" strokeWidth="2" fill="none" />
+    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none" />
+    <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" />
   </svg>
 );
 
@@ -60,14 +61,14 @@ const AVAILABLE_TOOL_HREFS = new Set( [
   '/tools/pdf-to-excel',
   '/tools/pdf-to-jpg',
   '/tools/tiktok-download',
-  '/tools/youtube-download',
+  '/tools/instagram-download',
 ] );
 
 const PREMIUM_TOOL_HREFS = new Set( [] );
 
 const FEATURED_TOOL_HREFS = new Set( [
   '/tools/tiktok-download',
-  '/tools/youtube-download',
+  '/tools/instagram-download',
 ] );
 
 const tools = [
@@ -206,10 +207,10 @@ const tools = [
     inputType: 'url',
   },
   {
-    icon: YouTubeIcon,
-    title: 'Download YouTube Video',
-    description: 'Download videos from YouTube in HD quality.',
-    href: '/tools/youtube-download',
+    icon: InstagramIcon,
+    title: 'Download Instagram Video',
+    description: 'Download Reels and videos from Instagram.',
+    href: '/tools/instagram-download',
     color: 'download',
     inputType: 'url',
   }
