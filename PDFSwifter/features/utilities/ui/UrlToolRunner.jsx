@@ -324,7 +324,7 @@ export default function UrlToolRunner({ tool }) {
 						setUsageStatus(data.usage);
 					}
 					const downloadResult = data.result;
-					if ((tool === "youtube-download" || tool === "tiktok-download") && downloadResult?.job) {
+					if ((tool === "youtube-download" || tool === "tiktok-download" || tool === "instagram-download") && downloadResult?.job) {
 						jobStarted = true;
 						startJobTracking(downloadResult.job, data.message || downloadResult.message);
 						return;

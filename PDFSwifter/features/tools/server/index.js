@@ -9,6 +9,7 @@ import * as pdfToExcelModule from './pdf-to-excel.js';
 import * as pdfToJpgModule from './pdf-to-jpg.js';
 import * as tiktokDownloadModule from './tiktok-download.js';
 import * as youtubeDownloadModule from './youtube-download.js';
+import * as instagramDownloadModule from './instagram-download.js';
 
 
 // Named processor exports for code clarity and reuse.
@@ -16,6 +17,7 @@ export const compressPdfProcessor = compressPdfModule;
 export const rotatePdfProcessor = rotatePdfModule;
 export const tiktokDownloadProcessor = tiktokDownloadModule;
 export const youtubeDownloadProcessor = youtubeDownloadModule;
+export const instagramDownloadProcessor = instagramDownloadModule;
 
 // Central registry mapping tool keys to their modules.
 // registry object lets you easily reference tools by key (e.g. registry['pdf-to-word'])
@@ -27,6 +29,7 @@ const registry = {
   'pdf-to-jpg': pdfToJpgModule,
   'tiktok-download': tiktokDownloadProcessor,
   'youtube-download': youtubeDownloadProcessor,
+  'instagram-download': instagramDownloadProcessor,
 };
 
 export default registry;
@@ -38,6 +41,7 @@ export const compressPdf = compressPdfProcessor;
 export const rotatePdf = rotatePdfProcessor;
 export const tiktokDownload = tiktokDownloadProcessor;
 export const youtubeDownload = youtubeDownloadProcessor;
+export const instagramDownload = instagramDownloadProcessor;
 export const pdfToWord = pdfToWordModule;
 export const pdfToExcel = pdfToExcelModule;
 export const pdfToJpg = pdfToJpgModule;
