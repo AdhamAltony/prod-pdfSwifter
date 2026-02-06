@@ -282,6 +282,9 @@ export default function UrlToolRunner({ tool }) {
 
     setProcessing(true);
     setMessage("");
+    setJobInfo({ pending: true });
+    setJobStatus("queued");
+    setJobDetail("Starting download...");
 
     let jobStarted = false;
 
@@ -329,6 +332,9 @@ export default function UrlToolRunner({ tool }) {
 
           setDownloadReadyJob(null);
           setManualDownloadData(null);
+          setJobInfo(null);
+          setJobStatus(null);
+          setJobDetail("");
 
           if (downloadResult?.downloadUrl) {
             setManualDownloadData({
@@ -356,6 +362,9 @@ export default function UrlToolRunner({ tool }) {
         }
 
         setDownloadReadyJob(null);
+        setJobInfo(null);
+        setJobStatus(null);
+        setJobDetail("");
         setManualDownloadData({
           type: "blob",
           blob,
