@@ -81,6 +81,8 @@ YOUTUBE_CONCURRENT_FRAGMENT_DOWNLOADS = _env_int(
     "YOUTUBE_CONCURRENT_FRAGMENT_DOWNLOADS", 4
 )
 YOUTUBE_MAX_FILESIZE_MB = _env_int("YOUTUBE_MAX_FILESIZE_MB", 0)
+# Proxy for YouTube downloads (e.g., socks5://user:pass@host:port or http://host:port)
+YOUTUBE_PROXY = os.environ.get("YOUTUBE_PROXY")
 
 REDIS_URL = os.environ.get("REDIS_URL")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development").strip().lower()

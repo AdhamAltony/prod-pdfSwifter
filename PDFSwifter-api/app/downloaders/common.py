@@ -12,6 +12,7 @@ from app.config import (
     YOUTUBE_SOCKET_TIMEOUT_SECONDS,
     YOUTUBE_SOURCE_ADDRESS,
     YOUTUBE_COOKIES_PATH,
+    YOUTUBE_PROXY,
 )
 
 
@@ -50,6 +51,9 @@ def download_video(
 
     if YOUTUBE_SOURCE_ADDRESS:
         cmd.extend(["--source-address", YOUTUBE_SOURCE_ADDRESS])
+
+    if YOUTUBE_PROXY:
+        cmd.extend(["--proxy", YOUTUBE_PROXY])
 
     if YOUTUBE_MAX_FILESIZE_MB and YOUTUBE_MAX_FILESIZE_MB > 0:
         cmd.extend(["--max-filesize", f"{YOUTUBE_MAX_FILESIZE_MB}M"])
