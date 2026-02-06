@@ -428,7 +428,13 @@ export default function UrlToolRunner({ tool }) {
 							type="url"
 							value={url}
 							onChange={(e) => setUrl(e.target.value)}
-							placeholder="https://www.youtube.com/watch?v=... or https://www.tiktok.com/@..."
+							placeholder={
+								tool === "tiktok-download"
+									? "https://www.tiktok.com/@username/video/..."
+									: tool === "instagram-download"
+										? "https://www.instagram.com/reel/... or https://www.instagram.com/p/..."
+										: "Enter URL"
+							}
 							className="w-full rounded-xl border border-slate-200 bg-slate-50/60 pl-10 pr-3 py-2 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
 							disabled={processing}
 						/>
@@ -523,7 +529,13 @@ export default function UrlToolRunner({ tool }) {
 			</form>
 
 		<div className="mt-8 text-sm text-gray-500 text-center">
-			<p>Supported platforms: TikTok, Instagram</p>
+			<p>
+				{tool === "tiktok-download"
+					? "Paste any TikTok video URL to download"
+					: tool === "instagram-download"
+						? "Paste any Instagram Reel or video URL to download"
+						: "Paste a video URL to download"}
+			</p>
 			<p>Downloads videos in HD quality when available</p>
 		</div>
 

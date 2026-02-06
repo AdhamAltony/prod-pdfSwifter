@@ -5,22 +5,16 @@ import Footer from "@/shared/ui/Footer";
 export default function About() {
   const team = [
     {
-      name: "Adham Ahmed",
-      role: "Founder & Engineer",
+      name: "Adham Altony",
+      role: "Fullstack Developer",
       bio: "Building tiny utilities that remove friction for people who work with PDFs every day.",
-      twitter: "https://twitter.com",
+      link: "https://adhamaltony.me",
     },
     {
-      name: "Lina Hassan",
-      role: "Product Designer",
-      bio: "Designs focused interfaces and guides the visual language of pdfSwifter.",
-      twitter: "https://twitter.com",
-    },
-    {
-      name: "Sam Ortiz",
-      role: "Frontend Engineer",
-      bio: "Turns flows into responsive, accessible UI with reliable performance.",
-      twitter: "https://twitter.com",
+      name: "Ramez Khalifa",
+      role: "Backend Developer",
+      bio: "Architects robust server infrastructure and APIs that power pdfSwifter's processing engine.",
+      link: null,
     },
   ];
 
@@ -143,11 +137,13 @@ export default function About() {
                   </div>
                 </div>
                 <p className="mt-4 text-sm text-slate-600">{member.bio}</p>
-                <div className="mt-4">
-                  <Link href={member.twitter} className="text-sm font-semibold text-emerald-700 hover:underline">
-                    Follow
-                  </Link>
-                </div>
+                {member.link && (
+                  <div className="mt-4">
+                    <Link href={member.link} className="text-sm font-semibold text-emerald-700 hover:underline">
+                      Website
+                    </Link>
+                  </div>
+                )}
               </div>
             ))}
           </div>

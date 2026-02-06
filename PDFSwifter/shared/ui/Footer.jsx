@@ -8,7 +8,7 @@ const Footer = () => {
     { name: "Merge PDF", href: "/tools/merge-pdf" },
     { name: "Compress PDF", href: "/tools/compress-pdf" },
     { name: "PDF to Word", href: "/tools/pdf-to-word" },
-    { name: "Download YouTube Video", href: "/tools/youtube-download" },
+    { name: "Download Instagram Video", href: "/utilities/instagram-download" },
   ];
 
   const companyLinks = [
